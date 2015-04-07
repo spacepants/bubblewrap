@@ -2,7 +2,7 @@
 
 ### About
 
-This repository contains the [Packer](http://packer.io) and [Puppet](http://puppetlabs.com) manifests used to pack and ship boxes to [Vagrant Cloud](http://vagrantcloud.com/puppetlabs).
+This repository contains the [Packer](http://packer.io) and [Puppet](http://puppetlabs.com) manifests used to pack and ship boxes to [Vagrant Cloud](http://vagrantcloud.com/spacepants).
 
 ### VM settings
 
