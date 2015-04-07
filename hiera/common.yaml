@@ -183,6 +183,8 @@ php::fpm::pools:
     listen_group: 'nginx'
 php::package_prefix: 'php56u-'
 php::pear::package: 'php56u-pear'
+redis::package_name: 'redis28u'
+redis::redis_version_override: '2.8.x'
 www::admin_pw: 'admin'
 www::db_name: 'wwwdev_db'
 www::db_user: 'wwwdev'
