@@ -1,0 +1,190 @@
+---
+mysql::client::package_name: 'MariaDB-client'
+mysql::server::config_file: '/etc/my.cnf.d/server.cnf'
+mysql::server::package_name: 'MariaDB-server'
+mysql::server::service_name: 'mysql'
+mysql::server::override_options:
+  mysqld_safe:
+    log-error: '/var/log/mariadb/mariadb.log'
+  mysqld:
+    log-error: '/var/log/mariadb/mariadb.log'
+    pid-file: '/var/run/mariadb/mariadb.pid'
+nginx::config::confd_purge: true
+nginx::config::vhost_purge: true
+nginx::nginx_locations:
+  'www_favicon':
+    vhost: 'www.stedwards.box'
+    location: '/favicon.ico'
+    location_custom_cfg:
+      access_log: 'off'
+      log_not_found: 'off'
+  'www_robots_txt':
+    vhost: 'www.stedwards.box'
+    location: '/robots.txt'
+    location_custom_cfg:
+      allow: 'all'
+      access_log: 'off'
+      log_not_found: 'off'
+  'www_backup':
+    vhost: 'www.stedwards.box'
+    location: '/backup'
+    location_custom_cfg:
+      deny: 'all'
+  'www_txt_log':
+    vhost: 'www.stedwards.box'
+    location: '~* \.(txt|log)$'
+    location_custom_cfg:
+      allow: '127.0.0.1'
+      deny: 'all'
+  'www_rewrite':
+    vhost: 'www.stedwards.box'
+    location: '@rewrite'
+    location_custom_cfg:
+      rewrite: '^/(.*)$ /index.php?q=$1'
+  'www_php':
+    vhost: 'www.stedwards.box'
+    location: '~ \.php$'
+    www_root: '/var/www/www.stedwards.box'
+    fastcgi: 'unix:/var/run/php-fpm.sock'
+    fastcgi_param:
+      SCRIPT_FILENAME: '$document_root$fastcgi_script_name'
+    fastcgi_split_path: '^(.+\.php)(/.+)$'
+    location_cfg_append:
+      fastcgi_intercept_errors: 'on'
+  'www_default':
+    vhost: 'www.stedwards.box'
+    location: '/'
+    location_custom_cfg:
+      try_files: '$uri $uri/ @rewrite'
+      index: 'index.php'
+      expires: 'max'
+nginx::nginx_vhosts:
+  'www.stedwards.box':
+    index_files:
+      - index.php
+    www_root: '/var/www/www.stedwards.box'
+    use_default_location: false
+php::extensions:
+  gd:
+    package_prefix: 'php56u-'
+  ldap:
+    settings:
+      ldap/ldap.max_links: '-1'
+  mbstring:
+    package_prefix: 'php56u-'
+  mysqlnd:
+    package_prefix: 'php56u-'
+  opcache:
+    package_prefix: 'php56u-'
+  pdo:
+    settings:
+      Pdo_mysql/pdo_mysql.cache_size: '2000'
+      Pdo_mysql/pdo_mysql.default_socket:
+  soap:
+    settings:
+      soap/soap.wsdl_cache_enabled: '1'
+      soap/soap.wsdl_cache_dir: '"/tmp"'
+      soap/soap.wsdl_cache_ttl: '86400'
+      soap/soap.wsdl_cache_limit: '5'
+  tidy:
+    package_prefix: 'php56u-'
+  apcu:
+    package_prefix: 'php56u-pecl-'
+  geoip:
+    package_prefix: 'php56u-pecl-'
+  redis:
+    package_prefix: 'php56u-pecl-'
+php::settings:
+  PHP/engine: 'On'
+  PHP/short_open_tag: 'On'
+  PHP/asp_tags: 'Off'
+  PHP/precision: '14'
+  PHP/output_buffering: '4096'
+  PHP/zlib.output_compression: 'Off'
+  PHP/implicit_flush: 'Off'
+  PHP/unserialize_callback_func:
+  PHP/serialize_precision: '17'
+  PHP/disable_functions:
+  PHP/disable_classes:
+  PHP/zend.enable_gc: 'On'
+  PHP/expose_php: 'Off'
+  PHP/max_execution_time: '30'
+  PHP/max_input_time: '120'
+  PHP/memory_limit: '512M'
+  PHP/error_reporting: 'E_ALL & ~E_DEPRECATED & ~E_STRICT'
+  PHP/display_errors: 'Off'
+  PHP/display_startup_errors: 'Off'
+  PHP/log_errors: 'On'
+  PHP/log_errors_max_len: '1024'
+  PHP/ignore_repeated_errors: 'Off'
+  PHP/ignore_repeated_source: 'Off'
+  PHP/report_memleaks: 'On'
+  PHP/track_errors: 'Off'
+  PHP/html_errors: 'On'
+  PHP/error_log: '/var/log/nginx/php_error.log'
+  PHP/variables_order: '"GPCS"'
+  PHP/request_order: '"GP"'
+  PHP/register_argc_argv: 'Off'
+  PHP/auto_globals_jit: 'On'
+  PHP/post_max_size: '8M'
+  PHP/auto_prepend_file:
+  PHP/auto_append_file:
+  PHP/default_mimetype: '"text/html"'
+  PHP/doc_root:
+  PHP/user_dir:
+  PHP/enable_dl: 'Off'
+  PHP/cgi.fix_pathinfo: "0"
+  PHP/file_uploads: 'On'
+  PHP/upload_max_filesize: '20M'
+  PHP/max_file_uploads: '20'
+  PHP/allow_url_fopen: 'Off'
+  PHP/allow_url_include: 'Off'
+  PHP/default_socket_timeout: '60'
+  Date/date.timezone: 'America/Chicago'
+  mail function/SMTP: 'localhost'
+  mail function/smtp_port: '25'
+  mail function/mail.add_x_header: 'On'
+  mysqlnd/mysqlnd.collect_statistics: 'On'
+  mysqlnd/mysqlnd.collect_memory_statistics: 'Off'
+  SQL/sql.safe_mode: 'Off'
+  Tidy/tidy.clean_output: 'Off'
+php::cli::settings:
+  PHP/allow_url_fopen: 'On'
+  CLI Server/cli_server.color: 'On'
+php::fpm::settings:
+  Session/session.save_handler: 'files'
+  Session/session.use_cookies: '1'
+  Session/session.use_only_cookies: '1'
+  Session/session.name: 'PHPSESSID'
+  Session/session.auto_start: '0'
+  Session/session.cookie_lifetime: '0'
+  Session/session.cookie_path: '/'
+  Session/session.cookie_domain:
+  Session/session.cookie_httponly:
+  Session/session.serialize_handler: 'php'
+  Session/session.gc_probability: '1'
+  Session/session.gc_divisor: '1000'
+  Session/session.gc_maxlifetime: '1440'
+  Session/session.referer_check:
+  Session/session.cache_limiter: 'nocache'
+  Session/session.cache_expire: '180'
+  Session/session.use_trans_sid: '0'
+  Session/session.hash_function: '0'
+  Session/session.hash_bits_per_character: '5'
+  Session/url_rewriter.tags: '"a=href,area=href,frame=src,input=src,form=fakeentry"'
+php::fpm::config::user: 'nginx'
+php::fpm::config::group: 'nginx'
+php::fpm::config::log_owner: 'nginx'
+php::fpm::config::log_group: 'nginx'
+php::fpm::pools:
+  'www':
+    listen: '/var/run/php-fpm.sock'
+    listen_owner: 'nginx'
+    listen_group: 'nginx'
+php::package_prefix: 'php56u-'
+php::pear::package: 'php56u-pear'
+www::admin_pw: 'admin'
+www::db_name: 'wwwdev_db'
+www::db_user: 'wwwdev'
+www::db_pass: 'wwwdev'
+www::site_url: www.stedwards.box

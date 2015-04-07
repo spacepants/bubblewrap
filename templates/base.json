@@ -1,0 +1,112 @@
+{
+
+  "variables":
+    {
+      "template_name": "wwwdev-centos-6.6",
+      "template_os": "RedHat_64",
+
+      "iso_url": "http://mirror.rackspace.com/CentOS/6.6/isos/x86_64/CentOS-6.6-x86_64-netinstall.iso",
+      "iso_checksum": "2560335ef975907799251ae9d6a0fa2e4d289704",
+      "iso_checksum_type": "sha1",
+
+      "memory_size": "1024",
+      "cpu_count": "2",
+
+      "provisioner": "virtualbox",
+      "required_modules": "puppetlabs-stdlib saz-ssh stahnma-epel"
+    },
+
+  "builders": [
+    {
+      "name": "{{user `template_name`}}",
+      "type": "virtualbox-iso",
+      "boot_command": [
+        "<tab> <wait>",
+        "text <wait>",
+        "ks=http://{{ .HTTPIP }}:{{ .HTTPPort }}/ks.cfg <wait>",
+        "<enter>"
+      ],
+      "boot_wait": "10s",
+      "disk_size": 80960,
+      "guest_os_type": "{{user `template_os`}}",
+      "http_directory": "files",
+      "iso_checksum": "{{user `iso_checksum`}}",
+      "iso_checksum_type": "{{user `iso_checksum_type`}}",
+      "iso_url": "{{user `iso_url`}}",
+      "ssh_username": "root",
+      "ssh_password": "stedwards",
+      "ssh_port": 22,
+      "ssh_wait_timeout": "10000s",
+      "shutdown_command": "/sbin/halt -h -p",
+      "virtualbox_version_file": ".vbox_version",
+      "vboxmanage": [
+        [
+          "modifyvm",
+          "{{.Name}}",
+          "--memory",
+          "{{user `memory_size`}}"
+        ],
+        [
+          "modifyvm",
+          "{{.Name}}",
+          "--cpus",
+          "{{user `cpu_count`}}"
+        ],
+        [
+          "modifyvm",
+          "{{.Name}}",
+          "--ioapic",
+          "off"
+        ]
+      ],
+      "vm_name": "packer-{{user `template_name`}}"
+    }
+  ],
+
+  "provisioners": [
+    {
+      "type": "shell",
+      "execute_command": "{{.Vars}} sh '{{.Path}}' {{user `required_modules`}}",
+      "scripts": [
+        "scripts/bootstrap-puppet.sh",
+        "scripts/bootstrap-modules.sh"
+      ]
+    },
+
+    {
+      "type": "file",
+      "source": "hiera/common.yaml",
+      "destination": "/var/lib/hiera/common.yaml"
+    },
+
+    {
+      "type": "puppet-masterless",
+      "execute_command": "{{.FacterVars}} puppet apply --verbose --detailed-exitcodes --modulepath='/tmp/packer-puppet-masterless/manifests/modules' {{.ManifestFile}}",
+      "facter": {
+        "provisioner": "{{user `provisioner`}}"
+      },
+      "manifest_dir": "manifests",
+      "manifest_file": "manifests/base.pp"
+    },
+
+    {
+      "type": "puppet-masterless",
+      "execute_command": "{{.FacterVars}} puppet apply --verbose --detailed-exitcodes --modulepath='/tmp/packer-puppet-masterless/manifests/modules' {{.ManifestFile}}",
+      "facter": {
+        "provisioner": "{{user `provisioner`}}",
+        "redis_version": "2.4.x"
+      },
+      "manifest_dir": "manifests",
+      "manifest_file": "manifests/wwwdev.pp"
+    },
+
+    {
+      "type": "shell",
+      "scripts": [
+        "scripts/cleanup-puppet.sh",
+        "scripts/cleanup-packer.sh"
+      ]
+    }
+  ]
+
+}

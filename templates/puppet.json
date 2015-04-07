@@ -1,0 +1,97 @@
+{
+
+  "variables":
+    {
+      "template_name": "wwwdev",
+      "os_version": "centos-6.6",
+      "provisioner": "virtualbox",
+      "required_modules": "puppetlabs-stdlib saz-sudo stahnma-puppetlabs_yum"
+    },
+
+  "builders": [
+    {
+      "name": "{{user `template_name`}}-{{user `os_version`}}-vagrant-puppet",
+      "type": "virtualbox-ovf",
+      "source_path": "output-{{user `template_name`}}-{{user `os_version`}}/packer-{{user `template_name`}}-{{user `os_version`}}.ovf",
+      "ssh_username": "root",
+      "ssh_password": "stedwards",
+      "ssh_port": 22,
+      "ssh_wait_timeout": "10000s",
+      "shutdown_command": "/sbin/halt -h -p"
+    }
+  ],
+
+  "provisioners": [
+    {
+      "type": "shell",
+      "execute_command": "{{.Vars}} sh '{{.Path}}' {{user `required_modules`}}",
+      "scripts": [
+        "scripts/bootstrap-puppet.sh",
+        "scripts/install-modules.sh"
+      ]
+    },
+
+    {
+      "type": "puppet-masterless",
+      "execute_command": "{{.FacterVars}} puppet apply --verbose --detailed-exitcodes --modulepath='/tmp/packer-puppet-masterless/manifests/modules' {{.ManifestFile}}",
+      "facter": {
+        "provisioner": "{{user `provisioner`}}"
+      },
+      "manifest_dir": "manifests",
+      "manifest_file": "manifests/vagrant/puppet.pp"
+    },
+
+    {
+      "type": "file",
+      "source": "hiera/common.yaml",
+      "destination": "/var/lib/hiera/common.yaml"
+    },
+
+    {
+      "type": "file",
+      "source": "manifests/modules/profiles",
+      "destination": "/etc/puppet/modules/profiles"
+    },
+
+    {
+      "type": "file",
+      "source": "manifests/modules/drupal",
+      "destination": "/etc/puppet/modules/drupal"
+    },
+
+    {
+      "type": "file",
+      "source": "manifests/wwwdev.pp",
+      "destination": "/etc/puppet/manifests/site.pp"
+    },
+
+    {
+      "type": "puppet-masterless",
+      "execute_command": "{{.FacterVars}} puppet apply --verbose --detailed-exitcodes {{.ManifestFile}}",
+      "facter": {
+        "provisioner": "{{user `provisioner`}}",
+        "redis_version": "2.4.x"
+      },
+      "manifest_dir": "manifests",
+      "manifest_file": "manifests/wwwdev.pp"
+    },
+
+    {
+      "type": "shell",
+      "scripts": [
+        "scripts/cleanup-bootstrap.sh",
+        "scripts/cleanup-packer.sh",
+        "scripts/cleanup-scrub.sh"
+      ]
+    }
+  ],
+
+  "post-processors": [
+    {
+      "type": "vagrant",
+      "output": "build/{{user `template_name`}}-{{user `os_version`}}-puppet.box",
+      "vagrantfile_template": "vagrantfiles/wwwdev.tpl"
+    }
+  ]
+
+}

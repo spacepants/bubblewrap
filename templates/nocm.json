@@ -1,0 +1,61 @@
+{
+
+  "variables":
+    {
+      "template_name": "wwwdev",
+      "os_version": "centos-6.6",
+      "provisioner": "virtualbox",
+      "required_modules": "puppetlabs-stdlib saz-sudo"
+    },
+
+  "builders": [
+    {
+      "name": "{{user `template_name`}}-{{user `os_version`}}-vagrant-nocm",
+      "type": "virtualbox-ovf",
+      "source_path": "output-{{user `template_name`}}-{{user `os_version`}}/packer-{{user `template_name`}}-{{user `os_version`}}.ovf",
+      "ssh_username": "root",
+      "ssh_password": "stedwards",
+      "ssh_port": 22,
+      "ssh_wait_timeout": "10000s",
+      "shutdown_command": "/sbin/halt -h -p"
+    }
+  ],
+
+  "provisioners": [
+    {
+      "type": "shell",
+      "execute_command": "{{.Vars}} sh '{{.Path}}' {{user `required_modules`}}",
+      "scripts": [
+        "scripts/bootstrap-puppet.sh"
+      ]
+    },
+
+    {
+      "type": "puppet-masterless",
+      "execute_command": "{{.FacterVars}} puppet apply --verbose --detailed-exitcodes --modulepath='/tmp/packer-puppet-masterless/manifests/modules' {{.ManifestFile}}",
+      "facter": {
+        "provisioner": "{{user `provisioner`}}"
+      },
+      "manifest_dir": "manifests",
+      "manifest_file": "manifests/vagrant/nocm.pp"
+    },
+
+    {
+      "type": "shell",
+      "scripts": [
+        "scripts/cleanup-puppet.sh",
+        "scripts/cleanup-packer.sh",
+        "scripts/cleanup-scrub.sh"
+      ]
+    }
+  ],
+
+  "post-processors": [
+    {
+      "type": "vagrant",
+      "output": "build/{{.Provider}}/{{user `template_name`}}-{{user `os_version`}}-nocm.box",
+      "vagrantfile_template": "vagrantfiles/wwwdev.tpl"
+    }
+  ]
+
+}

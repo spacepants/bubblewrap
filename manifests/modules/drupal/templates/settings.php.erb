@@ -1,0 +1,108 @@
+<?php
+
+/**
+ * MANAGED BY PUPPET
+ */
+
+/**
+ * Database settings:
+ */
+$databases = array (
+  'default' =>
+  array (
+    'default' =>
+    array (
+      'database' => '<%= @database %>',
+      'username' => '<%= @db_user %>',
+      'password' => '<%= @db_password %>',
+      'host' => '<%= @db_host %>',
+      'port' => '<%= @db_port %>',
+      'driver' => '<%= @db_driver %>',
+      'prefix' => '<%= @db_prefix %>',
+    ),
+  ),
+);
+
+/**
+ * Access control for update.php script.
+ */
+$update_free_access = FALSE;
+
+/**
+ * Salt for one-time login links and cancel links, form tokens, etc.
+ */
+$drupal_hash_salt = '7IooAoWe4ZliyE_weuo29O4UwJcNt2nv6VuqJV5l30k';
+
+/**
+ * Base URL (optional).
+ */
+<% if @base_url %>
+  $base_url = '<%= @base_url %>';  // NO trailing slash!
+<% end %>
+
+/**
+ * PHP settings:
+ */
+
+/**
+ * Drupal automatically generates a unique session cookie name for each site
+ * based on its full domain name. If you have multiple domains pointing at the
+ * same Drupal site, you can either redirect them all to a single domain (see
+ * comment in .htaccess), or uncomment the line below and specify their shared
+ * base domain. Doing so assures that users remain logged in as they cross
+ * between your various domains. Make sure to always start the $cookie_domain
+ * with a leading dot, as per RFC 2109.
+ */
+<% if @cookie_domain %>
+$cookie_domain = '<%= @cookie_domain %>';
+<% else %>
+# $cookie_domain not set
+<% end %>
+
+/**
+ * Variable overrides:
+ */
+
+/**
+ * Reverse Proxy Configuration:
+ */
+# $conf['reverse_proxy'] = TRUE;
+# $conf['reverse_proxy_addresses'] = array('a.b.c.d', ...);
+# $conf['reverse_proxy_header'] = 'HTTP_X_CLUSTER_CLIENT_IP';
+
+/**
+ * CSS/JS aggregated file gzip compression:
+ */
+$conf['css_gzip_compression'] = FALSE;
+$conf['js_gzip_compression'] = FALSE;
+
+/**
+ * Fast 404 pages:
+ */
+$conf['404_fast_paths_exclude'] = '/\/(?:styles)\//';
+$conf['404_fast_paths'] = '/\.(?:txt|png|gif|jpe?g|css|js|ico|swf|flv|cgi|bat|pl|dll|exe|asp)$/i';
+$conf['404_fast_html'] = '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML+RDFa 1.0//EN" "http://www.w3.org/MarkUp/DTD/xhtml-rdfa-1.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>404 Not Found</title></head><body><h1>Not Found</h1><p>The requested URL "@path" was not found on this server.</p></body></html>';
+
+/**
+ * Authorized file system operations:
+ */
+# $conf['allow_authorize_operations'] = FALSE;
+
+/**
+ * Install profile:
+ */
+$conf['install_profile'] = '<%= @install_profile %>';
+
+/**
+ * Additional host wide settings:
+ */
+<% if @global_include %>
+include_once('<%= @global_include %>');
+<% end %>
+
+/**
+ * Additional host wide settings:
+ */
+<% if @local_settings %>
+include_once('<%= @local_settings_path %>');
+<% end %>
