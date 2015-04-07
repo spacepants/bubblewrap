@@ -89,8 +89,7 @@
   "post-processors": [
     {
       "type": "vagrant",
-      "output": "build/{{user `template_name`}}-{{user `os_version`}}-puppet.box",
-      "vagrantfile_template": "vagrantfiles/wwwdev.tpl"
+      "output": "build/{{user `template_name`}}-{{user `os_version`}}-puppet.box"
     }
   ]
 
