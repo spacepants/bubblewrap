@@ -9,9 +9,9 @@ class profiles::drupal {
   $db_pass  = hiera('www::db_pass')
   $site_url = hiera('www::site_url')
 
-  class { '::redis': } ->
   class { '::nginx': } ->
   class { '::ius': } ->
+  class { '::redis': } ->
   class { '::php': } ->
   class { '::drupal': } ->
   mysql::db { $db_name:
