@@ -1,7 +1,7 @@
 box: wercker/ruby
 build:
   steps:
-    - install-packer:
+    - install-packages:
         packages: wget unzip
     - script:
         name: install packer
