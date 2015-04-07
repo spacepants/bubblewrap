@@ -11,8 +11,8 @@ build:
           ./packer version | tee $WERCKER_REPORT_MESSAGE_FILE
   after-steps:
     - email-notify:
-      from: buildbot@wercker.com
-      to: $EMAIL_ADDRESS
-      username: $EMAIL_USER
-      password: $EMAIL_PASS
-      host: $EMAIL_HOST
+        from: buildbot@wercker.com
+        to: $EMAIL_ADDRESS
+        username: $EMAIL_USER
+        password: $EMAIL_PASS
+        host: $EMAIL_HOST
