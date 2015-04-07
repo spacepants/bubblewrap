@@ -31,5 +31,8 @@ class packer::puppet {
       fail( "Unsupported platform: ${::osfamily}/${::operatingsystem}" )
     }
   }
-
+  file { '/etc/puppet/manifests':
+    ensure => directory,
+    require  => Package['puppet'],
+  }
 }
