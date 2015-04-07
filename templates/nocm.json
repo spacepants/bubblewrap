@@ -53,7 +53,7 @@
   "post-processors": [
     {
       "type": "vagrant",
-      "output": "build/{{.Provider}}/{{user `template_name`}}-{{user `os_version`}}-nocm.box",
+      "output": "build/{{user `template_name`}}-{{user `os_version`}}-nocm.box",
       "vagrantfile_template": "vagrantfiles/wwwdev.tpl"
     }
   ]
