@@ -12,6 +12,11 @@ build:
     - script:
         name: validate base template
         code: ./packer validate templates/base.json | tee $WERCKER_REPORT_MESSAGE_FILE
+    - script:
+        name: build base image
+        code: |
+          ./packer build templates/base.json | tee "${WERCKER_REPORT_ARTIFACTS_DIR}/packer_build_output.log"
+          tail -n 1 "${WERCKER_REPORT_ARTIFACTS_DIR}/packer_build_output.log" | tee $WERCKER_REPORT_MESSAGE_FILE
   after-steps:
     - email-notify:
         from: buildbot@wercker.com
