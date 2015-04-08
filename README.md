@@ -1,5 +1,7 @@
 # bubblewrap
 
+[![wercker status](https://app.wercker.com/status/6ed6021e1ba79c205ed49621dcb0e3f1/s "wercker status")](https://app.wercker.com/project/bykey/6ed6021e1ba79c205ed49621dcb0e3f1)
+
 ### About
 
 This repository contains the [Packer](http://packer.io) and [Puppet](http://puppetlabs.com) manifests used to pack and ship boxes to [Vagrant Cloud](http://vagrantcloud.com/spacepants).
