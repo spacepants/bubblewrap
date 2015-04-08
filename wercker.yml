@@ -2,7 +2,7 @@ box: wercker/ruby
 build:
   steps:
     - install-packages:
-        packages: wget unzip
+        packages: wget unzip virtualbox-4.3
     - script:
         name: install packer
         code: |
