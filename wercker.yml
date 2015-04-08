@@ -8,9 +8,9 @@ build:
         code: |
           sudo sh -c 'echo "deb http://download.virtualbox.org/virtualbox/debian precise contrib" >> /etc/apt/sources.list'
           wget -q http://download.virtualbox.org/virtualbox/debian/oracle_vbox.asc -O- | sudo apt-key add -
+          sudo apt-get install -y build-essential linux-headers-`uname -r` dkms
           sudo apt-get update
-          sudo apt-get install -y dkms virtualbox-4.3
-          sudo /etc/init.d/vboxdrv setup
+          sudo apt-get install -y virtualbox-4.3
     - script:
         name: install packer
         code: |
